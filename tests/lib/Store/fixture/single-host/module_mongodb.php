@@ -6,5 +6,7 @@ $config = array(
     'username' => '',
     'password' => '',
     'database' => 'test'
+    'dsn' => '',
+    'isReplicaConnectionString' => false
 );
 

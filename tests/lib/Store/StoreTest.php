@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use MongoDb\Driver\Manager;
 use MongoDb\Driver\Query;
 use MongoDb\Driver\BulkWrite;
-use \SimpleSAML_Configuration as Configuration;
+use \SimpleSAML\Configuration as Configuration;
 
 final class StoreTest extends TestCase
 {

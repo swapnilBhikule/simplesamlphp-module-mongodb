@@ -31,7 +31,7 @@ class sspmod_mongo_Store_Store extends Store
     public function __construct($connectionDetails = array())
     {
 	    $options = [];
-        $config = SimpleSAML_Configuration::getConfig('module_mongodb.php');
+        $config = SimpleSAML\Configuration::getConfig('module_mongodb.php');
         $connectionDetails = array_merge($config->toArray(), $connectionDetails);
         if (!empty($connectionDetails['replicaSet'])) {
         	$options['replicaSet'] = $connectionDetails['replicaSet'];
@@ -50,6 +50,12 @@ class sspmod_mongo_Store_Store extends Store
      * @return string The connection URI.
      */
     static function createConnectionURI($connectionDetails = array()) {
+
+        // return connection string if database configuration is set to string
+        if($connectionDetails['isReplicaConnectionString'] === true) {
+            return $connectionDetails['dsn'];
+        }
+
         $port = $connectionDetails['port'];
         $host = $connectionDetails['host'];
         $seedList = implode(',', array_map(function($host) use ($port) {
