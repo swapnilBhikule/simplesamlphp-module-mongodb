@@ -1,5 +1,5 @@
 {
-  "name": "prolificinteractive/simplesamlphp-module-mongodb",
+  "name": "makeitheady/simplesamlphp-module-mongodb",
   "description": "A SimpleSAMLphp module to provide a SimpleSAML_Store implementation for MongoDB in PHP 5.5 or higher.",
   "type": "simplesamlphp-module",
   "license": "MIT",
@@ -11,13 +11,13 @@
   ],
   "authors": [
     {
-      "name": "Chris Beaton",
-      "email": "c.beaton@prolificinteractive.com"
+      "name": "Prajyot Khandeparkar",
+      "email": "prajyot@heady.io"
     },
     {
-      "name": "Connor Cook",
-      "email": "connor@prolificinteractive.com",
-      "homepage": "https://www.prolificinteractive.com/"
+      "name": "Dev",
+      "email": "dev@heady.io",
+      "homepage": "https://www.heady.io/"
     }
   ],
   "require": {
