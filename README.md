@@ -69,6 +69,11 @@ Finally, you can enable the module by creating an empty file name `enable` in th
 
 ## Running test
 Setup up configuration in fixture. test/lib/Store/fixture/single-host/module_mongodb.php
+Set environment variables manually:
+```
+export DB_DEFAULT_CONNECTION=<database connection>
+export DB_MONGODB_DATABASE=<database>
+```
 Running the test: 
 ```
 vendor/bin/phpunit --bootstrap vendor/autoload.php --testsuite Store Tests
