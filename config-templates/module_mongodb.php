@@ -12,3 +12,9 @@ if(strpos(getenv('DB_DEFAULT_CONNECTION'), '_replica') !== false) {
     $config['replicaSet'] = getenv('DB_MONGODB_REPLICASET');
     $config['readPreference'] = getenv('DB_MONGODB_READ_PREFERENCE');
 }
+
+if(getenv('DB_DEFAULT_CONNECTION') === 'mongodb_replica_string') {
+    $config['dsn'] = getenv('DB_MONGODB_DSN');
+    $config['isReplicaConnectionString'] = true;
+}
+
