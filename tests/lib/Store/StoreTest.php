@@ -6,7 +6,7 @@
  * code.
  *
  * @author Chris Beaton <c.beaton@prolificinteractive.com>
- * @package prolificinteractive/simplesamlphp-module-mongo
+ * @package prolificinteractive/simplesamlphp-module-mongodb
  */
 
 namespace SimpleSAML\Test\Module\mongo\Store;
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use MongoDb\Driver\Manager;
 use MongoDb\Driver\Query;
 use MongoDb\Driver\BulkWrite;
-use \SimpleSAML_Configuration as Configuration;
+use \SimpleSAML\Configuration as Configuration;
 
 final class StoreTest extends TestCase
 {

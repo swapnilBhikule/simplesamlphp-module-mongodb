@@ -1,12 +1,12 @@
 <?php
 /**
- * This file is part of the simplesamlphp-module-mongo.
+ * This file is part of the simplesamlphp-module-mongodb.
  *
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source
  * code.
  *
  * @author Chris Beaton <c.beaton@prolificinteractive.com>
- * @package prolificinteractive/simplesamlphp-module-mongo
+ * @package prolificinteractive/simplesamlphp-module-mongodb
  */
 
 use \SimpleSAML\Store;
@@ -31,7 +31,7 @@ class sspmod_mongo_Store_Store extends Store
     public function __construct($connectionDetails = array())
     {
 	    $options = [];
-        $config = SimpleSAML_Configuration::getConfig('module_mongo.php');
+        $config = SimpleSAML\Configuration::getConfig('module_mongodb.php');
         $connectionDetails = array_merge($config->toArray(), $connectionDetails);
         if (!empty($connectionDetails['replicaSet'])) {
         	$options['replicaSet'] = $connectionDetails['replicaSet'];
@@ -50,6 +50,12 @@ class sspmod_mongo_Store_Store extends Store
      * @return string The connection URI.
      */
     static function createConnectionURI($connectionDetails = array()) {
+
+        // return connection string if database configuration is set to string
+        if($connectionDetails['isReplicaConnectionString'] === true) {
+            return $connectionDetails['dsn'];
+        }
+
         $port = $connectionDetails['port'];
         $host = $connectionDetails['host'];
         $seedList = implode(',', array_map(function($host) use ($port) {
@@ -61,6 +67,9 @@ class sspmod_mongo_Store_Store extends Store
                 ? "${connectionDetails['username']}:${connectionDetails['password']}@"
                 : '')
             ."${seedList}";
+        if(!empty($connectionDetails['database'])) {
+            $connectionURI .= '/' . $connectionDetails['database'];
+        }
 
         return $connectionURI;
     }
