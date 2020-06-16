@@ -8,7 +8,7 @@ $config = array(
     'database' => getenv('DB_MONGODB_DATABASE')
 );
 
-if(strpos(getenv('DB_DEFAULT_CONNECTION'), '_replica') !== false) {
+if(getenv('DB_DEFAULT_CONNECTION') === 'mongodb_replica') {
     $config['replicaSet'] = getenv('DB_MONGODB_REPLICASET');
     $config['readPreference'] = getenv('DB_MONGODB_READ_PREFERENCE');
 }
