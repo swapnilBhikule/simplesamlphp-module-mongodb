@@ -10,7 +10,7 @@
     </php>
     <testsuites>
         <testsuite name="Store Tests">
-            <directory suffix="Test.php">tests/lib/Store</directory>
+            <directory suffix="Test.php">tests/Store</directory>
         </testsuite>
     </testsuites>
 </phpunit>

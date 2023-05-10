@@ -1,4 +1,7 @@
 <?php
+
+namespace SimpleSAML\Module\mongodb\StoreInterface;
+
 /**
  * This file is part of the simplesamlphp-module-mongodb.
  *
@@ -9,16 +12,17 @@
  * @package prolificinteractive/simplesamlphp-module-mongodb
  */
 
-use \SimpleSAML\Store;
 use MongoDb\Driver\Manager;
 use MongoDb\Driver\Query;
 use MongoDb\Driver\BulkWrite;
+use SimpleSAML\Configuration;
+use SimpleSAML\Store\StoreInterface;
 
 /**
  * Class sspmod_mongo_Store_Store
  *
  */
-class sspmod_mongo_Store_Store extends Store
+class Store implements StoreInterface
 {
     protected $manager;
     protected $dbName;
@@ -30,13 +34,13 @@ class sspmod_mongo_Store_Store extends Store
      */
     public function __construct($connectionDetails = array())
     {
-	    $options = [];
-        $config = SimpleSAML\Configuration::getConfig('module_mongodb.php');
+        $options = [];
+        $config = Configuration::getConfig('module_mongodb.php');
         $connectionDetails = array_merge($config->toArray(), $connectionDetails);
         if (!empty($connectionDetails['replicaSet'])) {
-        	$options['replicaSet'] = $connectionDetails['replicaSet'];
-        	if(!empty($connectionDetails['readPreference'])) {
-        	    $options['readPreference'] = $connectionDetails['readPreference'];
+            $options['replicaSet'] = $connectionDetails['replicaSet'];
+            if (!empty($connectionDetails['readPreference'])) {
+                $options['readPreference'] = $connectionDetails['readPreference'];
             }
         }
         $this->manager = new Manager($this->createConnectionURI($connectionDetails), $options);
@@ -49,27 +53,25 @@ class sspmod_mongo_Store_Store extends Store
      * @param array $connectionDetails An array of arguments to the database connection URI.
      * @return string The connection URI.
      */
-    static function createConnectionURI($connectionDetails = array()) {
+    public static function createConnectionURI($connectionDetails = array())
+    {
 
         // return connection string if database configuration is set to string
-        if($connectionDetails['isReplicaConnectionString'] === true) {
+        if ($connectionDetails['isReplicaConnectionString'] === true) {
             return $connectionDetails['dsn'];
         }
 
         $port = $connectionDetails['port'];
         $host = $connectionDetails['host'];
-        $seedList = implode(',', array_map(function($host) use ($port) {
+        $seedList = implode(',', array_map(function ($host) use ($port) {
             return "$host:$port";
         }, is_array($host) ? $host : explode(',', $host)));
 
         $connectionURI = "mongodb://"
-            .((!empty($connectionDetails['username']) && !empty($connectionDetails['password']))
-                ? "${connectionDetails['username']}:${connectionDetails['password']}@"
+            . ((!empty($connectionDetails['username']) && !empty($connectionDetails['password']))
+                ? $connectionDetails['username'] . ':' . $connectionDetails['password'] . '@'
                 : '')
-            ."${seedList}";
-        if(!empty($connectionDetails['database'])) {
-            $connectionURI .= '/' . $connectionDetails['database'];
-        }
+            . $seedList;
 
         return $connectionURI;
     }
@@ -109,7 +111,7 @@ class sspmod_mongo_Store_Store extends Store
             }
         }
 
-        if (! empty($cursor['payload'])) {
+        if (!empty($cursor['payload'])) {
             $payload = unserialize($cursor['payload']);
 
             return $payload;
@@ -127,7 +129,7 @@ class sspmod_mongo_Store_Store extends Store
      * @param int|null $expire The expiration time (unix timestamp), or null if it never expires.
      * @return array|bool
      */
-    public function set($type, $key, $value, $expire = null)
+    public function set(string $type, string $key, $value, ?int $expire = null): void
     {
         assert(is_string($type));
         assert(is_string($key));
@@ -146,17 +148,12 @@ class sspmod_mongo_Store_Store extends Store
         $bulk = new BulkWrite();
         $bulk->update(['session_id' => $key], $document, $options);
         $this->manager->executeBulkWrite($this->getMongoNamespace($type), $bulk);
-
-        return $expire;
     }
 
     /**
      * Delete a value from the data store.
-     *
-     * @param string $type The data type.
-     * @param string $key The key.
      */
-    public function delete($type, $key)
+    public function delete(string $type, string $key): void
     {
         assert(is_string($type));
         assert(is_string($key));
@@ -169,16 +166,16 @@ class sspmod_mongo_Store_Store extends Store
 
     protected function getMongoNamespace($type)
     {
-    	return "{$this->dbName}.{$type}";
+        return "{$this->dbName}.{$type}";
     }
 
     public function getManager()
     {
-        return !empty($this->manager) ? $this->manager : NULL;
+        return !empty($this->manager) ? $this->manager : null;
     }
 
     public function getDatabase()
     {
-        return !empty($this->dbName) ? $this->dbName : NULL;
+        return !empty($this->dbName) ? $this->dbName : null;
     }
 }
