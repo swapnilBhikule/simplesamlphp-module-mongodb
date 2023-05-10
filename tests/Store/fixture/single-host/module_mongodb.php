@@ -3,10 +3,9 @@
 $config = array(
     'host' => 'localhost',
     'port' => 27017,
-    'username' => '',
-    'password' => '',
-    'database' => 'test'
+    'username' => 'root',
+    'password' => 'password',
+    'database' => 'test',
     'dsn' => '',
     'isReplicaConnectionString' => false
 );
-

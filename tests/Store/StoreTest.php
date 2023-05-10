@@ -1,13 +1,4 @@
 <?php
-/**
- * Test for the store:Mongo data store.
- *
- * For the full copyright and license information, please view the LICENSE file that was distributed with this source
- * code.
- *
- * @author Chris Beaton <c.beaton@prolificinteractive.com>
- * @package prolificinteractive/simplesamlphp-module-mongodb
- */
 
 namespace SimpleSAML\Test\Module\mongo\Store;
 
@@ -15,20 +6,23 @@ use PHPUnit\Framework\TestCase;
 use MongoDb\Driver\Manager;
 use MongoDb\Driver\Query;
 use MongoDb\Driver\BulkWrite;
-use \SimpleSAML\Configuration as Configuration;
+use SimpleSAML\Configuration;
+use SimpleSAML\Module;
+use SimpleSAML\Module\mongodb\StoreInterface\Store;
+use SimpleSAML\Store\StoreFactory;
 
 final class StoreTest extends TestCase
 {
     public function testSingleHostConnection()
     {
         Configuration::setConfigDir(__DIR__ . '/fixture/single-host');
-        new \sspmod_mongo_Store_Store();
+        new Store();
         $this->assertTrue(true);
     }
 
     public function testGet()
     {
-        $store = new \sspmod_mongo_Store_Store();
+        $store = new Store();
         $manager = $store->getManager();
 
         // Remove everything in the collection first
@@ -57,7 +51,7 @@ final class StoreTest extends TestCase
 
     public function testExpiredGet()
     {
-        $store = new \sspmod_mongo_Store_Store();
+        $store = new Store();
         $manager = $store->getManager();
 
         $this->clearSessions($manager);
@@ -78,7 +72,7 @@ final class StoreTest extends TestCase
 
     public function testSet()
     {
-        $store = new \sspmod_mongo_Store_Store();
+        $store = new Store();
         $manager = $store->getManager();
 
         $this->clearSessions($manager);
@@ -101,9 +95,8 @@ final class StoreTest extends TestCase
         $this->assertEquals(1, $this->getSessionCount($manager));
 
         $value = array('some' => 'otherthing');
-        $result = $store->set($type, $key, $value, $expire);
+        $store->set($type, $key, $value, $expire);
         $this->assertEquals(1, $this->getSessionCount($manager));
-        $this->assertEquals($expire, $result);
         $result = $store->get($type, $key);
         $this->assertEquals($result, $value);
         $this->assertEquals(1, $this->getSessionCount($manager));
@@ -111,7 +104,7 @@ final class StoreTest extends TestCase
 
     public function testDelete()
     {
-        $store = new \sspmod_mongo_Store_Store();
+        $store = new Store();
         $manager = $store->getManager();
 
         $this->clearSessions($manager);
@@ -127,6 +120,17 @@ final class StoreTest extends TestCase
 
         $store->delete($type, $key);
         $this->assertEquals(0, $this->getSessionCount($manager));
+    }
+
+    public function testResolveClass(): void
+    {
+        symlink(__DIR__ . '/../../src', __DIR__ . '/../../vendor/simplesamlphp/simplesamlphp/modules/mongodb');
+        $store = StoreFactory::getInstance('mongodb:Store');
+
+        $this->assertEquals(Store::class, get_class($store));
+        $this->assertEquals(Store::class, Module::resolveClass('mongodb:Store', 'StoreInterface'));
+
+        unlink(__DIR__ . '/../../vendor/simplesamlphp/simplesamlphp/modules/mongodb');
     }
 
     protected function getSessionNamespace()
