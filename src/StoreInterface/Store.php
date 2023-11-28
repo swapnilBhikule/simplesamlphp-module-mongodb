@@ -62,12 +62,15 @@ class Store implements StoreInterface
         $seedList = implode(',', array_map(function ($host) use ($port) {
             return "$host:$port";
         }, is_array($host) ? $host : explode(',', $host)));
+        $authSource = array_key_exists('authSource', $connectionDetails)
+            ? '/?authSource=' . $connectionDetails['authSource']
+            : '';
 
         return "mongodb://"
             . ((!empty($connectionDetails['username']) && !empty($connectionDetails['password']))
                 ? $connectionDetails['username'] . ':' . $connectionDetails['password'] . '@'
                 : '')
-            . $seedList;
+            . $seedList . $authSource;
     }
 
     /**
