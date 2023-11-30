@@ -12,6 +12,7 @@ namespace SimpleSAML\Module\mongodb\StoreInterface;
  * @package prolificinteractive/simplesamlphp-module-mongodb
  */
 
+use Exception;
 use MongoDb\Driver\Manager;
 use MongoDb\Driver\Query;
 use MongoDb\Driver\BulkWrite;
@@ -24,15 +25,13 @@ use SimpleSAML\Store\StoreInterface;
  */
 class Store implements StoreInterface
 {
-    protected $manager;
-    protected $dbName;
+    protected Manager $manager;
+    protected mixed $dbName;
 
     /**
-     * sspmod_mongo_Store_Store constructor.
-     *
-     * @param array $connectionDetails
+     * @throws Exception
      */
-    public function __construct($connectionDetails = array())
+    public function __construct(array $connectionDetails = [])
     {
         $options = [];
         $config = Configuration::getConfig('module_mongodb.php');
@@ -49,11 +48,8 @@ class Store implements StoreInterface
 
     /**
      * Builds the connection URI from the specified connection details.
-     *
-     * @param array $connectionDetails An array of arguments to the database connection URI.
-     * @return string The connection URI.
      */
-    public static function createConnectionURI($connectionDetails = array())
+    public static function createConnectionURI(array $connectionDetails = []): string
     {
 
         // return connection string if database configuration is set to string
@@ -70,24 +66,19 @@ class Store implements StoreInterface
             ? '/?authSource=' . $connectionDetails['authSource']
             : '';
 
-        $connectionURI = "mongodb://"
+        return "mongodb://"
             . ((!empty($connectionDetails['username']) && !empty($connectionDetails['password']))
                 ? $connectionDetails['username'] . ':' . $connectionDetails['password'] . '@'
                 : '')
             . $seedList . $authSource;
-
-        return $connectionURI;
     }
 
     /**
      * Retrieve a value from the data store.
      *
-     * @param string $type The data type.
-     * @param string $key The key.
-     *
-     * @return mixed|null The value.
+     * @throws \MongoDB\Driver\Exception\Exception
      */
-    public function get($type, $key)
+    public function get(string $type, string $key): mixed
     {
         assert(is_string($type));
         assert(is_string($key));
@@ -115,9 +106,7 @@ class Store implements StoreInterface
         }
 
         if (!empty($cursor['payload'])) {
-            $payload = unserialize($cursor['payload']);
-
-            return $payload;
+            return unserialize($cursor['payload']);
         }
 
         return $cursor;
@@ -125,14 +114,8 @@ class Store implements StoreInterface
 
     /**
      * Save a value to the data store.
-     *
-     * @param string $type The data type.
-     * @param string $key The key.
-     * @param mixed $value The value.
-     * @param int|null $expire The expiration time (unix timestamp), or null if it never expires.
-     * @return array|bool
      */
-    public function set(string $type, string $key, $value, ?int $expire = null): void
+    public function set(string $type, string $key, mixed $value, ?int $expire = null): void
     {
         assert(is_string($type));
         assert(is_string($key));
@@ -167,12 +150,12 @@ class Store implements StoreInterface
         $this->manager->executeBulkWrite($this->getMongoNamespace($type), $bulk);
     }
 
-    protected function getMongoNamespace($type)
+    protected function getMongoNamespace($type): string
     {
-        return "{$this->dbName}.{$type}";
+        return "$this->dbName.$type";
     }
 
-    public function getManager()
+    public function getManager(): ?Manager
     {
         return !empty($this->manager) ? $this->manager : null;
     }
